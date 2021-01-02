@@ -2,53 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DialogueParser : MonoBehaviour
+public class DatabaseManager : MonoBehaviour
 {
-    public Dialogue[] Parse(string _CSVFileName)
+    public static DatabaseManager instance;
+
+    [SerializeField] string csv_FileName;
+
+    Dictionary<int, Dialogue> dialogueDic = new Dictionary<int, Dialogue>();
+
+    public static bool isFinish = false;
+
+    public bool[] eventFlags = new bool[100];
+
+    Dialogue[] dialogues;
+
+    string[] dialogueTexts;
+
+    private void Awake()
     {
-        List<Dialogue> dialogueList = new List<Dialogue>(); //대화리스트 생성
-        TextAsset csvData = Resources.Load<TextAsset>(_CSVFileName); //CSV파일 가져옴
-
-        string[] data = csvData.text.Split(new char[] { '\n' }); //엔터기준으로 쪼갬
-
-        for(int i = 1;i < data.Length;)
+        if(instance == null)
         {
-            string[] row = data[i].Split(new char[] { ',' });
-            Dialogue dialogue = new Dialogue();
+            instance = this;
+            DialogueParser theParser = GetComponent<DialogueParser>();
+            Dialogue[] dialogues = theParser.Parse(csv_FileName);
 
-            dialogue.name = row[1];
-
-            List<string> contextList = new List<string>();
-            List<string> spriteList = new List<string>();
-            List<string> voiceList = new List<string>();
-
-
-            do
+            for (int i = 0; i < dialogues.Length; i++)
             {
-                contextList.Add(row[2]);
-                spriteList.Add(row[3]);
-                voiceList.Add(row[4]);
-
-                if (++i < data.Length)
-                {
-                    row = data[i].Split(new char[] { ',' });
-                }
-                else
-                {
-                    break;
-                }
-            } while (row[0].ToString() == "");
-
-            dialogue.contexts = contextList.ToArray();
-            dialogue.spriteName = spriteList.ToArray();
-            dialogue.VoiceName = voiceList.ToArray();
-
-            dialogueList.Add(dialogue);
-
+                dialogueDic.Add(i + 1, dialogues[i]);
+            }
+            isFinish = true;
         }
-        return dialogueList.ToArray();
     }
+    public Dialogue[] GetDialogue(int _StartNum, int _EndNum) 
+    {
+        List<Dialogue> dialougeList = new List<Dialogue>();
+        
+        for(int i = 0; i <= _EndNum - _StartNum; i++)
+        {
 
-  
+         dialougeList.Add(dialogueDic[_StartNum + i]);
+        }
+        return dialougeList.ToArray();    
+    }
 
 }
