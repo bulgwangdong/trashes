@@ -1,0 +1,23 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InteractionDoor : MonoBehaviour
+{
+
+    [SerializeField] string sceneName;
+    [SerializeField] string locationName;
+    [SerializeField] bool isOnlyView;
+
+    public string GetSceneName()
+    {
+        CameraController.onlyView = isOnlyView;
+        return sceneName;
+    }
+
+    public string GetLocationName()
+    {
+        return locationName;
+    }
+
+}
